@@ -8,8 +8,8 @@
  *
  * @author YX
  */
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.*;
 import java.util.*;
@@ -19,24 +19,41 @@ public class textAnalysis {
     {
       Path currentRelativePath = Paths.get("");
       String s = currentRelativePath.toAbsolutePath().toString();
-      String file = "smrt-tweet-data.txt";
+      String file = s+"/smrt_tweet_data.txt";
       String[] compare = {
-          "breakdown",
-          "stuck",
+          "breakdown"
+          ,"stuck"
+          ,"long"
+//          ,"stop"
           
       };
       Date date = new Date();
       List<String[]> tweets = filterTweets(file, compare, date);
+      for(int i=0; i < tweets.size(); i++){
+          String[] tweet = tweets.get(i);
+          System.out.println("Message:"+tweet[0]+", Date:"+tweet[1]);
+      }
+      
     }
     public static List<String[]> filterTweets(String file, String[] compare, Date date){
-        List<String[]> tweets = null;
+        List<String[]> tweets = new ArrayList<String[]>();
         try{
-        tweets = Files.lines(Paths.get(file))
+        tweets = Files.lines(Paths.get(file),StandardCharsets.ISO_8859_1)
+        //Long count = Files.lines(Paths.get(file),StandardCharsets.ISO_8859_1)
         //.parallel()
         .map(s -> getMessageAndDate(s))
-        .filter(d -> filterDate(d[1],date))
+        //.filter(d -> filterDate(d[1],date))
         .filter(a -> filterCheck(a[0],compare))
         .collect(Collectors.toList());
+//        .filter(s -> s.contains("content"))
+//        .count();
+        //System.out.println("Count = "+count);
+
+//Helps check if file is faulty
+//           Long count = Files.lines(Paths.get("y.txt"))
+//                   .count();
+//           System.out.println("Count = "+count);
+
       }
       catch(Exception e){
         e.printStackTrace();
@@ -67,8 +84,9 @@ public class textAnalysis {
     }
     
     public static String[] getMessageAndDate(String s){
+        //System.out.println("getMessageAndDate");
         String[] messageAndDate = new String[2];
-        String[] original = s.split(",");
+        String[] original = s.split(",\"");
         String message = original[0].split(":")[1];
         //System.out.println("message = "+message);
         String date = original[2].split(":")[1];
