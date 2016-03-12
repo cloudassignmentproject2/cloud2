@@ -19,7 +19,7 @@ public class textAnalysis {
     {
       Path currentRelativePath = Paths.get("");
       String s = currentRelativePath.toAbsolutePath().toString();
-      String file = s+"/smrt_tweet_data.txt";
+      String file = s+"/web/resources/smrt_tweet_data.txt";
       String[] compare = {
           "breakdown"
           ,"stuck"
