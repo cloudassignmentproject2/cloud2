@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import org.json.JSONObject;
@@ -36,20 +37,20 @@ public class taxiQueue {
     
     public static void main(String[] arg){
         try{
-            writeTaxiQueueCSV();
+            getTaxiQueueList();
         }
         catch(Exception ex){
             ex.printStackTrace();
         }
         
     }
-    public static void writeTaxiQueueCSV() throws FileNotFoundException, IOException{
-        System.out.println("writeTaxiQ");
-      Path currentRelativePath = Paths.get("");
+    public static ArrayList<String> getTaxiQueueList() throws FileNotFoundException, IOException{
+      ArrayList<String> taxiQueueList = new ArrayList<String>();
+        Path currentRelativePath = Paths.get("");
       String path = currentRelativePath.toAbsolutePath().toString();
       String file = path+"/web/resources/techcq-query-results.csv";
       HashMap<Integer, String[]> taxiQs = new HashMap<Integer, String[]>();
-      SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
       Files.lines(Paths.get(file))
         //Long count = Files.lines(Paths.get(file),StandardCharsets.ISO_8859_1)
         //.parallel()
@@ -76,8 +77,8 @@ public class taxiQueue {
             }
             
         });
-      PrintWriter printer = new PrintWriter(new File("web\\resources\\taxiQueue.csv"));
-      printer.write("taxi_stand_id,taxi_stand_name,taxi_num,people_num,lat,lon\n");
+      //PrintWriter printer = new PrintWriter(new File("web\\resources\\taxiQueue.csv"));
+      //printer.write("taxi_stand_id,taxi_stand_name,taxi_num,people_num,lat,lon\n");
         
       for (int key : taxiQs.keySet()) {
           String[] queueInfo = taxiQs.get(key);
@@ -86,11 +87,12 @@ public class taxiQueue {
           String taxiNum = queueInfo[5];
           String peopleNum = queueInfo[4];
           String[] latlon = getLongtitudeLatitute(name);
-          printer.write(id+","+name+","+taxiNum+","+peopleNum+","+latlon[0]+","+latlon[1]);
+          String listItem = id+","+name+","+taxiNum+","+peopleNum+","+latlon[0]+","+latlon[1];
           System.out.println(id+","+name+","+taxiNum+","+peopleNum+","+latlon[0]+","+latlon[1]);
+          taxiQueueList.add(listItem);
         }
       
-      
+      return taxiQueueList;
       
     }
     
@@ -98,7 +100,7 @@ public class taxiQueue {
         //address = "Singapore "+address;
         String key = "AIzaSyC7-wRn9K-fHU2xggxHdGU0M3JMllsumhM";
         String urlAddress = address.replace(" ", "+");
-        URL url = new URL("https://maps.googleapis.com/maps/api/geocode/json?address=Singapore" + urlAddress + "&key=" + key + "");
+        URL url = new URL("https://maps.googleapis.com/maps/api/geocode/json?address=Singapore+" + urlAddress + "&key=" + key + "");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         
         conn.setRequestMethod("GET");
