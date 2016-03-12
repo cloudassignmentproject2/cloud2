@@ -12,6 +12,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Date;
 import org.json.JSONObject;
 
 /**
@@ -19,11 +22,9 @@ import org.json.JSONObject;
  * @author GYX
  */
 public class taxiQueue {
-    private String key = "AIzaSyC7-wRn9K-fHU2xggxHdGU0M3JMllsumhM";
-    private String address;
+    
 
-    public taxiQueue(String address) {
-        this.address = address;
+    public taxiQueue() {
     }
     
 //    public static void main(String[] arg){
@@ -37,9 +38,16 @@ public class taxiQueue {
 //        }
 //        
 //    }
+    public void writeTaxiQueueCSV(Date date){
+        Path currentRelativePath = Paths.get("");
+      String s = currentRelativePath.toAbsolutePath().toString();
+      String file = s+"/web/resources/smrt_tweet_data.txt";
+      
+    }
     
-    public String[] getLongtitudeLatitute() throws MalformedURLException, ProtocolException, IOException{
+    public String[] getLongtitudeLatitute(String address) throws MalformedURLException, ProtocolException, IOException{
         //address = "Singapore "+address;
+        String key = "AIzaSyC7-wRn9K-fHU2xggxHdGU0M3JMllsumhM";
         String urlAddress = address.replace(" ", "+");
         URL url = new URL("https://maps.googleapis.com/maps/api/geocode/json?address=Singapore" + urlAddress + "&key=" + key + "");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

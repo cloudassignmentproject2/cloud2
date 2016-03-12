@@ -38,8 +38,7 @@ public class handleTaxiQueueRequest extends HttpServlet {
             /* TODO output your page here. You may use following sample code. */
             HttpSession session = request.getSession();
             String address = request.getParameter("address");
-            taxiQueue taxiQ = new taxiQueue(address);
-            String[] latlon = taxiQ.getLongtitudeLatitute();
+            taxiQueue taxiQ = new taxiQueue();
             
             
         }
