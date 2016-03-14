@@ -4,9 +4,17 @@
         <servlet-name>handleTaxiQueueRequest</servlet-name>
         <servlet-class>handleTaxiQueueRequest</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>handleTweetRequest</servlet-name>
+        <servlet-class>handleTweetRequest</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>handleTaxiQueueRequest</servlet-name>
         <url-pattern>/handleTaxiQueueRequest</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>handleTweetRequest</servlet-name>
+        <url-pattern>/handleTweetRequest</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -8,6 +8,8 @@
  *
  * @author YX
  */
+package tweetAnalysis;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -15,8 +17,17 @@ import java.util.stream.*;
 import java.util.*;
 import java.nio.file.*;
 public class textAnalysis {
+
+    public textAnalysis() {
+    }
+    
+    
     public static void main(String[] args)
     {
+      getTweetList();
+      
+    }
+    public static List<String[]> getTweetList(){
       Path currentRelativePath = Paths.get("");
       String s = currentRelativePath.toAbsolutePath().toString();
       String file = s+"/web/resources/smrt_tweet_data.txt";
@@ -29,11 +40,11 @@ public class textAnalysis {
       };
       Date date = new Date();
       List<String[]> tweets = filterTweets(file, compare, date);
-      for(int i=0; i < tweets.size(); i++){
-          String[] tweet = tweets.get(i);
-          System.out.println("Message:"+tweet[0]+", Date:"+tweet[1]);
-      }
-      
+//      for(int i=0; i < tweets.size(); i++){
+//          String[] tweet = tweets.get(i);
+//          System.out.println("Message:"+tweet[0]+", Date:"+tweet[1]);
+//      }
+        return tweets;
     }
     public static List<String[]> filterTweets(String file, String[] compare, Date date){
         List<String[]> tweets = new ArrayList<String[]>();
@@ -45,14 +56,6 @@ public class textAnalysis {
         //.filter(d -> filterDate(d[1],date))
         .filter(a -> filterCheck(a[0],compare))
         .collect(Collectors.toList());
-//        .filter(s -> s.contains("content"))
-//        .count();
-        //System.out.println("Count = "+count);
-
-//Helps check if file is faulty
-//           Long count = Files.lines(Paths.get("y.txt"))
-//                   .count();
-//           System.out.println("Count = "+count);
 
       }
       catch(Exception e){
