@@ -232,7 +232,7 @@
         
         function setTaxiStand_Marker(taxiStandList){    // Take in Array
             var taxiStand_marker = {
-                url: 'markers/taxiStansd.png',
+                url: 'markers/taxiStand.png',
                 size: new google.maps.Size(20,24),
                 //origin: new google.maps.Point(0, 0)                
             }
