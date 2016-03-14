@@ -17,29 +17,52 @@
     
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.js"></script>
+    <script src="js/jquery.js"></script>    
    <script src="js/jquery.csv.js"></script>
   </head>
   <body>
      
     <div class="container">
         <div class="row">
-            <div class="col-md-3">
-               
+            <div class="col-lg-3">
+                <div style='background-color:#FFFFFF; width:92%; min-height: 45px; margin-left: 10px; margin-top:100px'><p style='font-size:16pt; padding-left:5px; padding-top:5px; padding-bottom:5px'>Twitter Sentiments</p></div>
+                <div id="twitterScroll" style="overflow:auto; height:80%; width:100%">
+                    
+                </div>
             </div>
             <div class="col-md-9">         
                 <br/><input id="searchTextField" type="text" size="50"><br/><br/>
-                <div id="map" style="width:900px; height:650px"></div> 
+                <label for="busStopsToggle">Bus Stops</label>
+                <input type="checkbox" onclick="updateCriteria();" id="busStopsToggle" />&nbsp;&nbsp;&nbsp;
+                <label for="taxiToggle">Taxis</label>
+                <input type="checkbox" onclick="updateCriteria();" id="taxiToggle" />&nbsp;&nbsp;&nbsp;
+                <label for="taxiStandsToggle">Taxi Stands</label>
+                <input type="checkbox" onclick="updateCriteria();" id="taxiStandsToggle" />
+                <div id="map" style="width:100%; height:650px"></div> 
             </div>
         </div>
     </div>   
     
     <script>
+        
+        var twitterData = [];
+        <%
+            for(int i = 0 ; i < 20; i++){
+        %>
+            twitterData.push("This is tweet number <%= i %>");
+        <%
+            }
+        %>        
 		
         var map;
         var searchRadius = 1; // kilometers
         var curLocationMarker;        
         var curLocationPerimter;
+        
+        var busCheck;
+        var taxiCheck;
+        var taxiStandCheck;
+        
         var infos;
         var overlayMarkers = [];
         var overlayBusServicesMarkers = [];
@@ -55,9 +78,16 @@
         var allBusStopsServices = [];
         var selectedBusStopsServices = [];
         
+        var taxiList = [];
+        var selectedTaxis = [];
+        
         var placeholderInput = document.getElementById('searchTextField');
         
-        
+        function updateCriteria(){
+            busCheck = document.getElementById("busStopsToggle").checked;
+            taxiCheck = document.getElementById("taxiToggle").checked;
+            taxiStandCheck = document.getElementById("taxiStandsToggle").checked; 
+        }
         
         function distanceBetweenPoints(lat1, lon1, lat2, lon2) {
             var p = 0.017453292519943295;    // Math.PI / 180
@@ -84,6 +114,26 @@
             return overlayBusServicesMarkers;
         }
         
+        function setTaxis_Marker(selectedTaxis){    // Take in Array            
+            for(var i = 0; i < selectedTaxis.length; i++){
+                var curLat = parseFloat(selectedTaxis[i][0]);
+                var curLng = parseFloat(selectedTaxis[i][1]);
+                
+                //Create Circle Radius
+                taxiCircle = new google.maps.Circle({
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.9,
+                    strokeWeight: 2,
+                    fillColor: '#FF0000',
+                    fillOpacity: 0.8,
+                    map: map,
+                    center: new google.maps.LatLng(curLat, curLng),
+                    radius: 15
+                });
+                
+                overlayMarkers.push(taxiCircle);
+            }                 
+        }
        
         function setBusStops_Marker(busStops){    // Take in Array
             var busStops_marker = {
@@ -175,7 +225,20 @@
             }
         }  
         
+        function getTaxisWithinRadius(currentPoint){
+            
+            for(var bs in taxiList){
+                var tempLat = parseFloat(taxiList[bs][0]);
+                var tempLng = parseFloat(taxiList[bs][1]);
+                if(searchRadius > distanceBetweenPoints(currentPoint.lat(), currentPoint.lng(), tempLat, tempLng)){
+                    selectedTaxis.push(taxiList[bs]);                    
+                }                
+            }           
+            
+        }
+        
         function getBusStopsWithinRadius(currentPoint){
+            
             selectedBusStops = [];
             //selectedBusStopsServices = [];
             for(var bs in allBusStops){
@@ -184,11 +247,13 @@
                 if(searchRadius > distanceBetweenPoints(currentPoint.lat(), currentPoint.lng(), tempLat, tempLng)){
                     selectedBusStops.push(allBusStops[bs]);                    
                 }                
-            }            
+            }      
             for(var c = 0 ; c < selectedBusStops.length; c++){
                 var t = selectedBusStops[c][0];
-                selectedBusStopsServices[allBusStopsServices["" + t][0]] = allBusStopsServices["" + t];                
+                
+                selectedBusStopsServices[allBusStopsServices["" + t][0]] = allBusStopsServices["" + t];
             }
+            
         }
         
         function showBusStopsAlongSvc(svc){
@@ -221,14 +286,26 @@
               zoom: 13
             });          
             
+            busCheck = document.getElementById("busStopsToggle").checked;
+            taxiCheck = document.getElementById("taxiToggle").checked;
+            taxiStandCheck = document.getElementById("taxiStandsToggle").checked; 
+            
             google.maps.event.addListener(map, 'click', function(event){
-                
-                plotCurrentLocation(event.latLng);
-                getBusStopsWithinRadius(event.latLng);  // Value Stored in selectedBusStops
+                selectedTaxis = [];
+                        
                 removeOverlayMarkers();
-                selectedServiceBusStop = [];
                 removeServiceOverlayMarkers();
-                setBusStops_Marker(selectedBusStops);
+                plotCurrentLocation(event.latLng);
+                
+                if(busCheck == true){
+                    getBusStopsWithinRadius(event.latLng);
+                    setBusStops_Marker(selectedBusStops);
+                    selectedServiceBusStop = [];        
+                }
+                if(taxiCheck == true){
+                    getTaxisWithinRadius(event.latLng);
+                    setTaxis_Marker(selectedTaxis);
+                }
                 
                 //Create Circle Radius
                 curLocationPerimter = new google.maps.Circle({
@@ -250,13 +327,22 @@
             var autocomplete = new google.maps.places.Autocomplete(placeholderInput);
             google.maps.event.addListener(autocomplete, 'place_changed', function() {
                 
-                plotCurrentLocation(autocomplete.getPlace().geometry.location);
-                getBusStopsWithinRadius(autocomplete.getPlace().geometry.location);  // Value Stored in selectedBusStops
+                selectedTaxis = [];
+                //selectedServiceBusStop = [];                
                 removeOverlayMarkers();
-                selectedServiceBusStop = [];
                 removeServiceOverlayMarkers();
-                setBusStops_Marker(selectedBusStops);
+                plotCurrentLocation(autocomplete.getPlace().geometry.location);
                 
+                if(busCheck == true){
+                    getBusStopsWithinRadius(autocomplete.getPlace().geometry.location);                    
+                    setBusStops_Marker(selectedBusStops);
+                    selectedServiceBusStop = []; 
+                }
+                if(taxiCheck == true){
+                    getTaxisWithinRadius(autocomplete.getPlace().geometry.location);
+                    setTaxis_Marker(selectedTaxis);
+                }
+               
                 //Create Circle Radius
                 curLocationPerimter = new google.maps.Circle({
                     strokeColor: '#3333cc',
@@ -274,7 +360,6 @@
                 
             });
         }
-        
         
         //Bus Stops CSV Data
         $.ajax({url: "resources/BusStop.csv", success: function(file_content){
@@ -339,7 +424,31 @@
             }
         });
         
-	  
+        //Taxis Location CSV Data
+        $.ajax({url: "resources/Taxi_1.csv", success: function(file_content){
+                taxiList = [];
+                taxiList = $.csv.toArrays(file_content);  
+                taxiList = taxiList.slice(1, taxiList.length);
+            }
+        });
+        
+        $(document).ready(function(){
+            var chk = true;
+            for(var x = 0 ; x < twitterData.length; x++){
+                if(chk){
+                    chk = false;
+                    var data = "<div style='background-color:#abc8d3; width:92%; min-height: 45px; margin-left: 10px'><p style='padding-left:5px; padding-top:5px; padding-bottom:5px'>" + twitterData[x]  + "</p></div>";
+                
+                }else{
+                    chk = true;
+                    var data = "<div style='background-color:#E5E4E2; width:92%; min-height: 45px; margin-left: 10px'><p style='padding-left:5px; padding-top:5px; padding-bottom:5px'>" + twitterData[x]  + "</p></div>";
+                
+                }
+                $('#twitterScroll').append(data);
+            }
+            
+        });
+	
 	  
 	  
     </script>
