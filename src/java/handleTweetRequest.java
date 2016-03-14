@@ -36,7 +36,7 @@ public class handleTweetRequest extends HttpServlet {
         
         HttpSession session = request.getSession();
         List<String[]> tweetList = textAnalysis.getTweetList();
-        session.setAttribute("taxiQueue", tweetList);
+        session.setAttribute("tweets", tweetList);
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");

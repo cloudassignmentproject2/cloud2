@@ -1,4 +1,6 @@
 
+<%@page import="tweetAnalysis.textAnalysis"%>
+<%@page import="java.util.List"%>
 <html>
   <head>
     <title>Simple Map</title>
@@ -42,14 +44,18 @@
             </div>
         </div>
     </div>   
-    
+    <%
+        List<String[]> tweetList = textAnalysis.getTweetList();
+        
+    %>
     <script>
         
         var twitterData = [];
         <%
-            for(int i = 0 ; i < 20; i++){
+            for(int i = 0 ; i < tweetList.size(); i++){
         %>
-            twitterData.push("This is tweet number <%= i %>");
+            
+            twitterData.push("<%= tweetList.get(i)[0] %>");
         <%
             }
         %>        
