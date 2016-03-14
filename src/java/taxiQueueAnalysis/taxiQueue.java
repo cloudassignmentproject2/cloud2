@@ -5,9 +5,11 @@
  */
 package taxiQueueAnalysis;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -44,11 +46,31 @@ public class taxiQueue {
         }
         
     }
+        private static void downloadUsingStream(String urlStr, String file) throws IOException{
+        URL url = new URL(urlStr);
+        BufferedInputStream bis = new BufferedInputStream(url.openStream());
+        FileOutputStream fis = new FileOutputStream(file);
+        byte[] buffer = new byte[1024];
+        int count=0;
+        while((count = bis.read(buffer,0,1024)) != -1)
+        {
+            fis.write(buffer, 0, count);
+        }
+        fis.close();
+        bis.close();
+    }
+        
     public static ArrayList<String> getTaxiQueueList() throws FileNotFoundException, IOException{
       ArrayList<String> taxiQueueList = new ArrayList<String>();
-        Path currentRelativePath = Paths.get("");
+      Path currentRelativePath = Paths.get("");
       String path = currentRelativePath.toAbsolutePath().toString();
-      String file = path+"/web/resources/techcq-query-results.csv";
+      String url = "https://s3-ap-southeast-1.amazonaws.com/taxiqueue/techcq-query-results.csv";
+      try {
+           downloadUsingStream(url, path +"/techcq-query-results.csv");
+        } catch (IOException e) {
+            e.printStackTrace();
+       }
+      String file = path +"/techcq-query-results.csv";
       HashMap<Integer, String[]> taxiQs = new HashMap<Integer, String[]>();
       SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
       Files.lines(Paths.get(file))

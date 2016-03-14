@@ -1,4 +1,9 @@
 
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.lang.reflect.Array"%>
+<%@page import="java.nio.file.Paths"%>
+<%@page import="java.nio.file.Path"%>
+<%@page import="java.io.File"%>
 <%@page import="tweetAnalysis.textAnalysis"%>
 <%@page import="java.util.List"%>
 <html>
@@ -23,6 +28,21 @@
    <script src="js/jquery.csv.js"></script>
   </head>
   <body>
+      <%
+        //Path currentRelativePath = Paths.get("");
+        //String s = currentRelativePath.toAbsolutePath().toString();
+        //File file = new File("resources/smrt_tweet_data.csv");
+        //System.out.println("Path =  "+ s);
+        session = request.getSession();
+        List<String[]> tweetList = new ArrayList<String[]>();
+        ArrayList<String> taxiQ = new ArrayList<String>();
+        tweetList = (List<String[]>)session.getAttribute("tweets");
+        taxiQ = (ArrayList<String>)session.getAttribute("taxiQueue");
+        
+        System.out.println("tweetList length = "+ tweetList.size());
+        System.out.println("taziQ length = "+ taxiQ.size());
+        
+    %>
      
     <div class="container">
         <div class="row">
@@ -44,22 +64,20 @@
             </div>
         </div>
     </div>   
-    <%
-        List<String[]> tweetList = textAnalysis.getTweetList();
-        
-    %>
+    
     <script>
         
         var twitterData = [];
         <%
-            for(int i = 0 ; i < tweetList.size(); i++){
+            for(int i = 0 ; i < 10; i++){
+                //System.out.println(tweetList.get(i)[0].toString());
         %>
             
-            twitterData.push("<%= tweetList.get(i)[0] %>");
+            twitterData.push(<%= tweetList.get(i)[0].toString() %>);
         <%
             }
         %>        
-		
+            
         var map;
         var searchRadius = 1; // kilometers
         var curLocationMarker;        

@@ -16,6 +16,10 @@
         <servlet-name>handleTweetRequest</servlet-name>
         <url-pattern>/handleTweetRequest</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>handleTweetRequest</servlet-name>
+        <url-pattern>/index.html</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

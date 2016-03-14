@@ -10,6 +10,13 @@
  */
 package tweetAnalysis;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -24,13 +31,39 @@ public class textAnalysis {
     
     public static void main(String[] args)
     {
-      getTweetList();
+      List<String[]> list = getTweetList();
+      System.out.println("List length = "+list.size());
       
     }
+    
+    private static void downloadUsingStream(String urlStr, String file) throws IOException{
+        URL url = new URL(urlStr);
+        BufferedInputStream bis = new BufferedInputStream(url.openStream());
+        FileOutputStream fis = new FileOutputStream(file);
+        byte[] buffer = new byte[1024];
+        int count=0;
+        while((count = bis.read(buffer,0,1024)) != -1)
+        {
+            fis.write(buffer, 0, count);
+        }
+        fis.close();
+        bis.close();
+    }
+    
     public static List<String[]> getTweetList(){
       Path currentRelativePath = Paths.get("");
+      String url = "http://ec2-54-169-123-186.ap-southeast-1.compute.amazonaws.com/ckan/dataset/d114a6d2-b27c-447f-80b0-f0ee843357f6/resource/9e4c0961-c4e9-402e-bad7-a9d6ac947bfe/download/smrt-tweet-data.txt";
       String s = currentRelativePath.toAbsolutePath().toString();
-      String file = s+"/web/resources/smrt_tweet_data.txt";
+      System.out.println("current Path = "+s);
+    try {
+           downloadUsingStream(url, s+"/smrt_tweet_data.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+       }
+      
+      File test = new File(s+"/smrt_tweet_data.txt");
+      System.out.println("File length = "+ test.length());
+      String file = s+"/smrt_tweet_data.txt";
       String[] compare = {
           "breakdown"
           ,"stuck"

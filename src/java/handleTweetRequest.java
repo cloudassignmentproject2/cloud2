@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import static taxiQueueAnalysis.taxiQueue.getTaxiQueueList;
 import tweetAnalysis.textAnalysis;
 
 /**
@@ -37,18 +38,15 @@ public class handleTweetRequest extends HttpServlet {
         HttpSession session = request.getSession();
         List<String[]> tweetList = textAnalysis.getTweetList();
         session.setAttribute("tweets", tweetList);
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet handleTweetRequest</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet handleTweetRequest at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+        try{
+            ArrayList<String> taxiQueueList = getTaxiQueueList();
+            session.setAttribute("taxiQueue", taxiQueueList);
+            //forgot how to return T.T
         }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+        response.sendRedirect("maps.jsp");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
